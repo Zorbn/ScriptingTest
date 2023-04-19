@@ -1,86 +1,49 @@
 public class Interpreter
 {
-    private Lexer _lexer;
-    private Token _currentToken;
-    
-    public Interpreter(Lexer lexer)
-    {
-        _lexer = lexer;
-        _currentToken = lexer.GetNextToken();
-    }
+    // TODO: Can this be static?
+    public Dictionary<Type, Func<Ast, int>> VisitorFunctions;
 
-    public void Eat(TokenType tokenType)
+    private Parser _parser;
+
+    public Interpreter(Parser parser)
     {
-        if (_currentToken.TokenType == tokenType)
+        _parser = parser;
+
+        VisitorFunctions = new()
         {
-            _currentToken = _lexer.GetNextToken();
-            return;
-        }
-
-        throw new Exception("Invalid syntax");
-    }
-     
-    private int Factor()
-    {
-        var token = _currentToken;
-        switch (token.TokenType)
-        {
-            case TokenType.Integer:
-                Eat(TokenType.Integer);
-                return token.Value!;
-            case TokenType.LeftParen:
-                Eat(TokenType.LeftParen);
-                var result = Expression();
-                Eat(TokenType.RightParen);
-                return result;
-        }
-
-        throw new Exception("Failed to evaluate factor");
+            { typeof(BinaryOp), VisitBinaryOp },
+            { typeof(Number), VisitNumber },
+        };        
     }
     
-    private int Term()
+    public int Interpret()
     {
-        var result = Factor();
-        
-        while (_currentToken.TokenType is TokenType.Multiply or TokenType.Divide)
-        {
-            switch (_currentToken.TokenType)
-            {
-                case TokenType.Multiply:
-                    Eat(TokenType.Multiply);
-                    result *= Factor();
-                    break;                
-                case TokenType.Divide:
-                    Eat(TokenType.Divide);
-                    result /= Factor();
-                    break;
-            }
-        }
+        var ast = _parser.Parse();
+        return Visit(ast);
+    }
 
-        return result;
+    public int Visit(Ast node)
+    {
+        return VisitorFunctions[node.GetType()](node);
     }
     
-    // Expression -> Integer Plus Integer
-    // Expression -> Integer Minus Integer
-    public int Expression()
+    private int VisitBinaryOp(Ast node)
     {
-        var result = Term();
+        var binaryOp = (BinaryOp)node;
 
-        while (_currentToken.TokenType is TokenType.Plus or TokenType.Minus)
+        return binaryOp.Op.TokenType switch
         {
-            switch (_currentToken.TokenType)
-            {
-                case TokenType.Plus:
-                    Eat(TokenType.Plus);
-                    result += Term();
-                    break;
-                case TokenType.Minus:
-                    Eat(TokenType.Minus);
-                    result -= Term();
-                    break;
-            }
-        }
+            TokenType.Plus => Visit(binaryOp.Left) + Visit(binaryOp.Right),
+            TokenType.Minus => Visit(binaryOp.Left) - Visit(binaryOp.Right),
+            TokenType.Multiply => Visit(binaryOp.Left) * Visit(binaryOp.Right),
+            TokenType.Divide => Visit(binaryOp.Left) / Visit(binaryOp.Right),
+            _ => throw new Exception($"Failed to visit invalid type {binaryOp.Op.TokenType}"),
+        };
+    }
 
-        return result;
+    private int VisitNumber(Ast node)
+    {
+        var number = (Number)node;
+        return number.Token.Value!;
     }
 }

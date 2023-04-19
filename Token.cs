@@ -10,7 +10,7 @@ public enum TokenType
     Eof,
 }
 
-public class Token
+public struct Token
 {
     public readonly TokenType TokenType;
     public readonly dynamic? Value; // TODO: Stop using dynamic?
