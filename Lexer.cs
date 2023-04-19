@@ -2,151 +2,75 @@ using System.Text;
 
 public class Lexer
 {
-    public struct LexerResult
+    private string _text;
+    private int _position = 0;
+    private char? _currentChar;
+
+    public Lexer(string text)
     {
-        public List<Token> Tokens;
-        public Error? Error;
+        _text = text;
+        _currentChar = _text[_position];
     }
 
-    private const string Digits = "0123456789";
-
-    private string _fileName;
-    private string _fileText;
-    private Position _position;
-
-    private char? _currentChar = null;
-
-    public Lexer(string fileName, string fileText)
+    private void Advance()
     {
-        _fileName = fileName;
-        _fileText = fileText;
-        
-        _position = new Position
-        {
-            Index = -1,
-            Line = 0,
-            Column = -1,
-            FileName = fileName,
-            FileText = fileText,
-        };
+        ++_position;
 
-        Advance();
-    }
-    
-    public void Advance()
-    {
-        _position.Advance(_currentChar);
-
-        if (_position.Index < _fileText.Length)
+        if (_position >= _text.Length)
         {
-            _currentChar = _fileText[_position.Index];
-        }
-        else {
             _currentChar = null;
-        }
-    }
-    
-    public LexerResult MakeTokens()
-    {
-        var tokens = new List<Token>();
-
-        while (_currentChar != null)
-        {
-            char currentChar = _currentChar.Value;
-            if (Digits.Contains(currentChar))
-            {
-                tokens.Add(MakeNumber());
-                continue;
-            }
-
-            // TODO: Can Advance be split out of this?
-            switch (currentChar)
-            {
-                case ' ':
-                case '\t':
-                    Advance();                
-                    break;
-                case '+':
-                    tokens.Add(new Token(Token.TokenType.Plus, start: _position));
-                    Advance();
-                    break;
-                case '-':
-                    tokens.Add(new Token(Token.TokenType.Minus, start: _position));
-                    Advance();
-                    break;
-                case '*':
-                    tokens.Add(new Token(Token.TokenType.Multiply, start: _position));
-                    Advance();
-                    break;
-                case '/':
-                    tokens.Add(new Token(Token.TokenType.Divide, start: _position));
-                    Advance();
-                    break;
-                case '(':
-                    tokens.Add(new Token(Token.TokenType.LeftParen, start: _position));
-                    Advance();
-                    break;
-                case ')':
-                    tokens.Add(new Token(Token.TokenType.RightParen, start: _position));
-                    Advance();
-                    break;
-                default:
-                    var illegalChar = currentChar;
-                    var start = _position.Copy();
-                    tokens.Clear();
-                    Advance();
-                    var end = _position;
-                    return new LexerResult
-                    {
-                        Tokens = tokens,
-                        Error = new Error(Error.ErrorType.IllegalCharacter, start, end, $"'{illegalChar}'"),
-                    };
-            }
-
+            return;
         }
 
-        tokens.Add(new Token(Token.TokenType.EOF, start: _position));
-        return new LexerResult
-        {
-            Tokens = tokens,
-            Error = null,
-        };
+        _currentChar = _text[_position];
     }
     
-    private Token MakeNumber()
+    private int GetInteger()
     {
-        var numberString = new StringBuilder();
-        int dotCount = 0;
-        var start = _position.Copy();
-
-        while (_currentChar is not null && (Digits.Contains(_currentChar.Value) || _currentChar == '.')) 
+        var result = new StringBuilder();
+        while (_currentChar is not null && Char.IsDigit(_currentChar.Value))
         {
-            if (_currentChar == '.')
-            {
-                if (dotCount > 0)
-                {
-                    // Numbers can't have more than one dot.
-                    break;
-                }
-
-                ++dotCount;
-                numberString.Append('.');
-            }
-            else
-            {
-                numberString.Append(_currentChar);
-            }
-
+            result.Append(_currentChar);
             Advance();
         }
-        
-        if (dotCount == 0)
+
+        return Int32.Parse(result.ToString());
+    }
+    
+    private void GetWhitespace()
+    {
+        while (_currentChar is not null && Char.IsWhiteSpace(_currentChar.Value))
         {
-            // The number is an integer.
-            return new Token(Token.TokenType.Integer, Int32.Parse(numberString.ToString()), start, _position);
+            Advance();
+        }
+    }
+ 
+    public Token GetNextToken()
+    {
+        GetWhitespace();
+
+        while (_currentChar is not null)
+        {
+            if (Char.IsDigit(_currentChar.Value))
+            {
+                return new Token(TokenType.Integer, GetInteger());
+            }
+
+            if (_currentChar == '*')
+            {
+                Advance();
+                return new Token(TokenType.Multiply, '*');
+            }
+
+            if (_currentChar == '/')
+            {
+                Advance();
+                return new Token(TokenType.Divide, '/');
+            }
+
+            throw new Exception("Error getting next token");
         }
 
-        // The number is a float.
-        return new Token(Token.TokenType.Integer, Single.Parse(numberString.ToString()), start, _position);
+        return new Token(TokenType.Eof, null);
     }
 }

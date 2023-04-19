@@ -1,10 +1,19 @@
-﻿internal class Program
+internal class Program
 {
     private static void Main()
     {
-        Console.WriteLine("No PL yet...");
+        while (true)
+        {
+            Console.Write("CALC > ");
+            var text = Console.ReadLine();
+            
+            if (text is null) continue;
 
-        var shell = new Shell();
-        shell.Start();
+            var lexer = new Lexer(text);
+            var interpreter = new Interpreter(lexer);
+            var result = interpreter.Expression();
+
+            Console.WriteLine(result);
+        }
     }
 }
