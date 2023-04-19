@@ -25,6 +25,12 @@ public class Parser
         var token = _currentToken;
         switch (token.TokenType)
         {
+            case TokenType.Plus:
+                Eat(TokenType.Plus);
+                return new UnaryOp(token, Factor());
+            case TokenType.Minus:
+                Eat(TokenType.Minus);
+                return new UnaryOp(token, Factor());
             case TokenType.Integer:
                 Eat(TokenType.Integer);
                 return new Number(token);

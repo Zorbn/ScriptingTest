@@ -17,6 +17,18 @@ public struct BinaryOp : Ast
     }
 }
 
+public struct UnaryOp : Ast
+{
+    public readonly Token Op;
+    public readonly Ast Expression;
+
+    public UnaryOp(Token op, Ast expression)
+    {
+        Op = op;
+        Expression = expression;        
+    }    
+}
+
 public struct Number : Ast
 {
     public readonly Token Token;
