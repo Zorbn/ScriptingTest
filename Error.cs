@@ -3,23 +3,29 @@ public class Error
     public enum ErrorType
     {
         IllegalCharacter,
+        InvalidSyntax,
     }
 
-    private ErrorType _errorType;
-    private string _details;
-    private Position _start;
-    private Position _end;
+    public readonly ErrorType Type;
+    public readonly string Details;
+    public readonly Position? Start;
+    public readonly Position? End;
 
-    public Error(ErrorType errorType, Position start, Position end, string details)
+    public Error(ErrorType errorType, Position? start, Position? end, string details)
     {
-        _errorType = errorType;
-        _details = details;
-        _start = start;
-        _end = end;
+        Type = errorType;
+        Details = details;
+        Start = start;
+        End = end;
     }
 
     public override string ToString()
     {
-        return $"{_errorType}: {_details}\nFile {_start.FileName}, Line {_start.Line + 1}";
+        if (Start is null || End is null)
+        {
+            return $"{Type}: {Details}";
+        }
+
+        return $"{Type}: {Details}\nFile {Start.FileName}, Line {Start.Line + 1}";
     }
 }

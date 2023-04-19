@@ -19,21 +19,34 @@ public class Shell
             }
             else
             {
-                foreach (var token in result.Tokens)
-                {
-                    Console.Write($"{token} ");
-                }
+                // foreach (var token in result.Tokens)
+                // {
+                //     Console.Write($"{token} ");
+                // }
+                Console.Write($"{result.Node}");
 
                 Console.Write("\n");
             }
         }
-    } 
-    
-    public Lexer.LexerResult Run(string fileName, string fileText)
+    }
+
+    public Parser.ParserResult Run(string fileName, string fileText)
     {
         var lexer = new Lexer(fileName, fileText);
         var result = lexer.MakeTokens();
+        
+        if (result.Error is not null)
+        {
+            return new Parser.ParserResult
+            {
+                Node = null,
+                Error = result.Error,
+            };
+        }
 
-        return result;
+        var parser = new Parser(result.Tokens);
+        var ast = parser.Parse();
+
+        return ast;
     }
 }

@@ -67,27 +67,27 @@ public class Lexer
                     Advance();                
                     break;
                 case '+':
-                    tokens.Add(new Token(Token.TokenType.Plus));
+                    tokens.Add(new Token(Token.TokenType.Plus, start: _position));
                     Advance();
                     break;
                 case '-':
-                    tokens.Add(new Token(Token.TokenType.Minus));
+                    tokens.Add(new Token(Token.TokenType.Minus, start: _position));
                     Advance();
                     break;
                 case '*':
-                    tokens.Add(new Token(Token.TokenType.Multiply));
+                    tokens.Add(new Token(Token.TokenType.Multiply, start: _position));
                     Advance();
                     break;
                 case '/':
-                    tokens.Add(new Token(Token.TokenType.Divide));
+                    tokens.Add(new Token(Token.TokenType.Divide, start: _position));
                     Advance();
                     break;
                 case '(':
-                    tokens.Add(new Token(Token.TokenType.LeftParen));
+                    tokens.Add(new Token(Token.TokenType.LeftParen, start: _position));
                     Advance();
                     break;
                 case ')':
-                    tokens.Add(new Token(Token.TokenType.RightParen));
+                    tokens.Add(new Token(Token.TokenType.RightParen, start: _position));
                     Advance();
                     break;
                 default:
@@ -105,6 +105,7 @@ public class Lexer
 
         }
 
+        tokens.Add(new Token(Token.TokenType.EOF, start: _position));
         return new LexerResult
         {
             Tokens = tokens,
@@ -116,7 +117,8 @@ public class Lexer
     {
         var numberString = new StringBuilder();
         int dotCount = 0;
-        
+        var start = _position.Copy();
+
         while (_currentChar is not null && (Digits.Contains(_currentChar.Value) || _currentChar == '.')) 
         {
             if (_currentChar == '.')
@@ -141,10 +143,10 @@ public class Lexer
         if (dotCount == 0)
         {
             // The number is an integer.
-            return new Token(Token.TokenType.Integer, Int32.Parse(numberString.ToString()));
+            return new Token(Token.TokenType.Integer, Int32.Parse(numberString.ToString()), start, _position);
         }
 
         // The number is a float.
-        return new Token(Token.TokenType.Integer, Single.Parse(numberString.ToString()));
+        return new Token(Token.TokenType.Integer, Single.Parse(numberString.ToString()), start, _position);
     }
 }
