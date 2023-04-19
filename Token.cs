@@ -5,6 +5,8 @@ public enum TokenType
     Minus,
     Multiply,
     Divide,
+    LeftParen,
+    RightParen,
     Eof,
 }
 

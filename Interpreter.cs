@@ -23,8 +23,19 @@ public class Interpreter
     private int Factor()
     {
         var token = _currentToken;
-        Eat(TokenType.Integer);
-        return token.Value!;
+        switch (token.TokenType)
+        {
+            case TokenType.Integer:
+                Eat(TokenType.Integer);
+                return token.Value!;
+            case TokenType.LeftParen:
+                Eat(TokenType.LeftParen);
+                var result = Expression();
+                Eat(TokenType.RightParen);
+                return result;
+        }
+
+        throw new Exception("Failed to evaluate factor");
     }
     
     private int Term()

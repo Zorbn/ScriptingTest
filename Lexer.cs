@@ -56,28 +56,26 @@ public class Lexer
                 return new Token(TokenType.Integer, GetInteger());
             }
 
-            if (_currentChar == '+')
+            switch (_currentChar)
             {
-                Advance();
-                return new Token(TokenType.Plus, '+');
-            }
-
-            if (_currentChar == '-')
-            {
-                Advance();
-                return new Token(TokenType.Minus, '+');
-            }
-
-            if (_currentChar == '*')
-            {
-                Advance();
-                return new Token(TokenType.Multiply, '*');
-            }
-
-            if (_currentChar == '/')
-            {
-                Advance();
-                return new Token(TokenType.Divide, '/');
+                case '+':
+                    Advance();
+                    return new Token(TokenType.Plus, '+');
+                case '-':
+                    Advance();
+                    return new Token(TokenType.Minus, '+');
+                case '*':
+                    Advance();
+                    return new Token(TokenType.Multiply, '*');
+                case '/':
+                    Advance();
+                    return new Token(TokenType.Divide, '/');
+                case '(':
+                    Advance();
+                    return new Token(TokenType.LeftParen, '(');
+                case ')':
+                    Advance();
+                    return new Token(TokenType.RightParen, ')');
             }
 
             throw new Exception("Error getting next token");
