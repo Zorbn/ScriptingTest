@@ -20,19 +20,17 @@ public class Interpreter
         throw new Exception("Invalid syntax");
     }
      
-    private dynamic Factor()
+    private int Factor()
     {
         var token = _currentToken;
         Eat(TokenType.Integer);
         return token.Value!;
     }
     
-    // Expression -> Integer Plus Integer
-    // Expression -> Integer Minus Integer
-    public int Expression()
+    private int Term()
     {
         var result = Factor();
-
+        
         while (_currentToken.TokenType is TokenType.Multiply or TokenType.Divide)
         {
             switch (_currentToken.TokenType)
@@ -40,10 +38,34 @@ public class Interpreter
                 case TokenType.Multiply:
                     Eat(TokenType.Multiply);
                     result *= Factor();
-                    break;
+                    break;                
                 case TokenType.Divide:
                     Eat(TokenType.Divide);
                     result /= Factor();
+                    break;
+            }
+        }
+
+        return result;
+    }
+    
+    // Expression -> Integer Plus Integer
+    // Expression -> Integer Minus Integer
+    public int Expression()
+    {
+        var result = Term();
+
+        while (_currentToken.TokenType is TokenType.Plus or TokenType.Minus)
+        {
+            switch (_currentToken.TokenType)
+            {
+                case TokenType.Plus:
+                    Eat(TokenType.Plus);
+                    result += Term();
+                    break;
+                case TokenType.Minus:
+                    Eat(TokenType.Minus);
+                    result -= Term();
                     break;
             }
         }

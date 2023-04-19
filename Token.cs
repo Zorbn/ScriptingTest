@@ -1,6 +1,8 @@
 public enum TokenType
 {
     Integer,
+    Plus,
+    Minus,
     Multiply,
     Divide,
     Eof,

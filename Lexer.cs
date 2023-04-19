@@ -56,6 +56,18 @@ public class Lexer
                 return new Token(TokenType.Integer, GetInteger());
             }
 
+            if (_currentChar == '+')
+            {
+                Advance();
+                return new Token(TokenType.Plus, '+');
+            }
+
+            if (_currentChar == '-')
+            {
+                Advance();
+                return new Token(TokenType.Minus, '+');
+            }
+
             if (_currentChar == '*')
             {
                 Advance();
