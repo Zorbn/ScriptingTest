@@ -36,7 +36,7 @@ public class Parser
         {
             return new ParserResult
             {
-                Error = new Error(Error.ErrorType.InvalidSyntax, start: _currentToken.Start, end: _currentToken.End, "Incomplete expression"),
+                Error = new Error(Error.ErrorType.InvalidSyntax, "Incomplete expression", _currentToken.Start, _currentToken.End),
             };
         }
 
@@ -92,12 +92,12 @@ public class Parser
                 return new ParserResult
                 {
                     Node = null,
-                    Error = new Error(Error.ErrorType.InvalidSyntax, _currentToken.Start, _currentToken.End, "Expected ')'"),
+                    Error = new Error(Error.ErrorType.InvalidSyntax, "Expected ')'", _currentToken.Start, _currentToken.End),
                 };
             }
         }
 
-        var error = new Error(Error.ErrorType.InvalidSyntax, token.Start, token.End, "Expected an int or a float");
+        var error = new Error(Error.ErrorType.InvalidSyntax, "Expected an int or a float", token.Start, token.End);
 
         return new ParserResult
         {

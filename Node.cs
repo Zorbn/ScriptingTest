@@ -2,51 +2,51 @@ public interface Node {}
 
 public class NumberNode : Node
 {
-    private Token _token;
+    public readonly Token Token;
 
     public NumberNode(Token token)
     {
-        _token = token;
+        Token = token;
     }
 
     public override string ToString()
     {
-        return $"{_token}";
+        return $"{Token}";
     }
 }
 
 public class BinOpNode : Node
 {
-    private Node _leftNode;
-    private Token _opToken;
-    private Node _rightNode;
+    public readonly Node LeftNode;
+    public readonly Token OpToken;
+    public readonly Node RightNode;
 
     public BinOpNode(Node leftNode, Token opToken, Node rightNode)
     {
-        _leftNode = leftNode;
-        _opToken = opToken;
-        _rightNode = rightNode;
+        LeftNode = leftNode;
+        OpToken = opToken;
+        RightNode = rightNode;
     }
 
     public override string ToString()
     {
-        return $"({_leftNode}, {_opToken}, {_rightNode})";
+        return $"({LeftNode}, {OpToken}, {RightNode})";
     }
 }
 
 public class UnaryOpNode : Node
 {
-    private Token _opToken;
-    private Node _node;
+    public readonly Token OpToken;
+    public readonly Node Node;
 
     public UnaryOpNode(Token opToken, Node node)
     {
-        _opToken = opToken;
-        _node = node;
+        OpToken = opToken;
+        Node = node;
     }
 
     public override string ToString()
     {
-        return $"({_opToken}, {_node})";
+        return $"({OpToken}, {Node})";
     }
 }

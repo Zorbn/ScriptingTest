@@ -99,7 +99,7 @@ public class Lexer
                     return new LexerResult
                     {
                         Tokens = tokens,
-                        Error = new Error(Error.ErrorType.IllegalCharacter, start, end, $"'{illegalChar}'"),
+                        Error = new Error(Error.ErrorType.IllegalCharacter, $"'{illegalChar}'", start, end),
                     };
             }
 
@@ -147,6 +147,6 @@ public class Lexer
         }
 
         // The number is a float.
-        return new Token(Token.TokenType.Integer, Single.Parse(numberString.ToString()), start, _position);
+        return new Token(Token.TokenType.Float, Single.Parse(numberString.ToString()), start, _position);
     }
 }
